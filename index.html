@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vik Sluijter</title>
+    <link rel="stylesheet" href="./src/styles/index.css" />
+  </head>
+  <body>
+    <!-- Dynamische achtergrond met pulserende cirkels -->
+    <div class="bg-circles">
+      <!-- Cirkel elementen worden dynamisch toegevoegd via JavaScript -->
+    </div>
+
+    <div class="container">
+      <div class="instructions">
+        <h2>Hoe te spelen?</h2>
+        <ol>
+          <li>
+            Er verschijnen gekleurde bubbels op het scherm die langzaam groter
+            worden.
+          </li>
+          <li>
+            Gebruik je handen om de bubbels te laten knappen door ze aan te
+            raken.
+          </li>
+          <li>Elke geknapte bubbel levert 1 punt op.</li>
+          <li>
+            Het spel wordt steeds moeilijker: de bubbels groeien sneller en
+            verschijnen vaker.
+          </li>
+          <li>
+            Als een bubbel te groot wordt (maximale grootte bereikt), is het
+            spel voorbij.
+          </li>
+          <li>
+            De bubbels veranderen van kleur naarmate ze groter worden: van blauw
+            naar paars naar rood.
+          </li>
+        </ol>
+      </div>
+
+      <div class="webcam">
+        <span>Duim omhoog voor 2 seconden om het spel te starten! 👍</span>
+        <div id="video-container">
+          <video id="video" width="640" height="480" autoplay></video>
+          <canvas id="output" width="640" height="480"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <img
+      class="logo"
+      src="./src/images/Arteveldelogo.png"
+      alt="Artevelde hogeschool logo"
+    />
+    <script src="./src/scripts/index.ts" type="module"></script>
+    <script>
+      // JavaScript om dynamisch cirkels toe te voegen aan de achtergrond
+      const circleContainer = document.querySelector(".bg-circles");
+
+      function createCircle() {
+        const circle = document.createElement("div");
+        circle.classList.add("circle");
+
+        // Willekeurige grootte en positie voor de cirkels
+        const size = Math.random() * 100 + 50; // Willekeurige grootte van 50px tot 150px
+        const positionX = Math.random() * window.innerWidth; // Willekeurige horizontale positie
+        const positionY = Math.random() * window.innerHeight; // Willekeurige verticale positie
+        const animationDuration = Math.random() * 4 + 2; // Willekeurige duur van 2 tot 6 seconden
+
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+        circle.style.left = `${positionX}px`;
+        circle.style.top = `${positionY}px`;
+        circle.style.animationDuration = `${animationDuration}s`;
+
+        circleContainer.appendChild(circle);
+      }
+
+      // Creëer cirkels om de paar honderd milliseconden
+      setInterval(createCircle, 500);
+    </script>
+  </body>
+</html>

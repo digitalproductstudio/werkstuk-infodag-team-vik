@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vik Sluijter</title>
+    <link rel="stylesheet" href="../styles/gameOver.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Linkerzijde: QR-code -->
+      <div class="left-side">
+        <img
+          src="../images/Arteveldelogo.png"
+          alt="Logo van artevelde hogeschool."
+          class="logo"
+        />
+        <h2>Wil je meer te weten komen over onze richting?</h2>
+        <p>Scan de QR-code voor meer informatie!</p>
+        <img
+          src="../images/qr-code.jpeg"
+          alt="QR-code naar Artevelde Hogeschool website"
+          class="qr-code"
+        />
+        <p>IMD2 - Vik Sluijter</p>
+      </div>
+
+      <!-- Rechterzijde: Game Over Scherm -->
+      <div class="right-side">
+        <h1>Game Over!</h1>
+        <p>👍 Speel opnieuw!</p>
+        <p>👎 Terug naar hoofdscherm!</p>
+
+        <p id="scoreDisplay"></p>
+
+        <!-- Webcam -->
+        <div class="video-container">
+          <video id="video" width="640" height="480" autoplay></video>
+          <canvas id="output" width="640" height="480"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      window.addEventListener("load", () => {
+        // Haal de score uit de URL op
+        const urlParams = new URLSearchParams(window.location.search);
+        const score = urlParams.get("score");
+
+        if (score) {
+          document.getElementById("scoreDisplay").innerText = `Score: ${score}`;
+        } else {
+          document.getElementById("scoreDisplay").innerText =
+            "Geen score gevonden";
+        }
+      });
+    </script>
+    <script src="../scripts/gameOver.ts" type="module"></script>
+  </body>
+</html>
