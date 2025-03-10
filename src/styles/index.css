@@ -1,0 +1,205 @@
+/* Algemene stijlen voor body */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(45deg, #1e3c72, #2a5298);
+  color: white;
+  overflow: hidden;
+  position: relative;
+  padding: 20px;
+}
+
+/* Dynamische achtergrond - pulserende cirkels */
+.bg-circles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bg-circles .circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  animation: pulseCircle 3s infinite ease-in-out;
+}
+
+@keyframes pulseCircle {
+  0% {
+    transform: scale(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0.7;
+  }
+}
+
+/* Container voor twee kolommen */
+.container {
+  z-index: 2;
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Instructies - linker kolom */
+.instructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.instructions h2 {
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.instructions ol {
+  list-style: none;
+  padding-left: 10px;
+}
+
+.instructions li {
+  margin-bottom: 12px;
+  line-height: 1.5rem;
+  position: relative;
+  padding-left: 20px;
+}
+
+.instructions li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #4e8cff;
+}
+
+/* Webcam container - rechter kolom */
+.webcam {
+  flex: 1.3;
+  position: relative;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 700px;
+}
+
+.webcam span {
+  display: block;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  text-align: center;
+  color: #4e8cff;
+  font-weight: bold;
+}
+
+#video-container {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  transform: scaleX(-1);
+}
+
+video,
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Logo rechtsonder */
+.logo {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  max-width: 120px;
+  z-index: 5;
+}
+
+/* Media queries voor responsieve weergave */
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .instructions,
+  .webcam {
+    max-width: 100%;
+  }
+
+  .instructions {
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-height: 750px) and (min-width: 901px) {
+  .instructions li {
+    line-height: 1.3rem;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .webcam span {
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 500px) {
+  .instructions h2 {
+    font-size: 1.2rem;
+  }
+
+  .instructions li {
+    font-size: 0.9rem;
+    line-height: 1.3rem;
+    margin-bottom: 8px;
+  }
+
+  .webcam span {
+    font-size: 0.9rem;
+  }
+
+  .logo {
+    max-width: 80px;
+  }
+}

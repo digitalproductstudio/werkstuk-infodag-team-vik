@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vik Sluijter</title>
+    <link rel="stylesheet" href="../styles/game.css" />
+  </head>
+  <body>
+    <!-- Bewegende bolletjes achtergrond -->
+    <div class="bg-bubbles">
+      <!-- Bolletjes worden dynamisch toegevoegd via JavaScript -->
+    </div>
+
+    <p id="start">Doe je duim omhoog om het spel te starten!</p>
+    <p id="timer">Are you ready!</p>
+
+    <div id="warning-message" class="warning-hidden">
+      Ga naar achter! Je bent te dichtbij!
+    </div>
+
+    <div class="video-container">
+      <video id="video" width="1024" height="768" autoplay></video>
+      <canvas id="output" width="1024" height="768"></canvas>
+    </div>
+
+    <p id="score">Score: 0</p>
+
+    <script src="../scripts/game.ts" type="module"></script>
+    <script>
+      // JavaScript om dynamisch bolletjes toe te voegen aan de achtergrond
+      const bubbleContainer = document.querySelector(".bg-bubbles");
+
+      function createBubble() {
+        const bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+        const size = Math.random() * 50 + 10; // Random grootte tussen 10px en 60px
+        const positionX = Math.random() * window.innerWidth; // Random positie horizontaal
+        const positionY = Math.random() * window.innerHeight; // Random positie verticaal
+        const animationDuration = Math.random() * 5 + 5; // Random snelheid van beweging (tussen 5s en 10s)
+
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+        bubble.style.left = `${positionX}px`;
+        bubble.style.top = `${positionY}px`;
+        bubble.style.animationDuration = `${animationDuration}s`;
+
+        bubbleContainer.appendChild(bubble);
+      }
+
+      // Creëer bolletjes om de paar honderd milliseconden
+      setInterval(createBubble, 300);
+    </script>
+  </body>
+</html>
