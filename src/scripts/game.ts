@@ -1,8 +1,3 @@
-import {
-  GestureRecognizer,
-  GestureRecognizerOptions,
-  FilesetResolver,
-} from "@mediapipe/tasks-vision";
 import { Hands } from "@mediapipe/hands";
 
 // ==================================================
@@ -17,7 +12,6 @@ const scoreElement = document.getElementById("score") as HTMLParagraphElement;
 let balls: Ball[] = [];
 let popEffects: PopEffect[] = []; // Array voor pop-animaties
 let gameOver = false; // Flag om te controleren of het spel voorbij is
-let gameStarted = false; // Flag om bij te houden of het spel gestart is
 let score = 0; // Score van de speler
 
 // ✅ Instellingen voor ballen
@@ -34,6 +28,11 @@ const popSounds = [
   new Audio("../audio/pop.mp3"),
   new Audio("../audio/pop.mp3"),
 ]; // Meerdere pop-geluiden voor variatie
+
+// ✅ Countdown variabelen
+let countdownTime = 3; // Countdown from 3 seconds
+let gameStarted = false; // Flag to track if the game has started
+const countdownElement = document.getElementById("countdown") as HTMLDivElement;
 
 // ==================================================
 // 📷 CAMERA SETUP
@@ -58,108 +57,12 @@ const hands = new Hands({
   },
 });
 
-const vision = await FilesetResolver.forVisionTasks(
-  // path/to/wasm/root
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
-);
-
-console.log("Laden van gesture model...");
-const gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
-  baseOptions: {
-    modelAssetPath: "../models/gesture_recognizer.task",
-    delegate: "GPU", // ✅ Gebruik GPU in plaats van CPU
-  },
-  runningMode: "VIDEO",
-  numHands: 2,
-} as GestureRecognizerOptions);
-
 hands.setOptions({
   maxNumHands: 4,
   modelComplexity: 1,
   minDetectionConfidence: 0.5,
   minTrackingConfidence: 0.5,
 });
-
-// ✅ Detectie van een "Thumbs Up" gebaar om het spel te starten
-// ✅ Variabelen voor de timer
-let thumbsUpTimer = 2; // Timer begint bij 2 seconden
-let isThumbsUpDetected = false; // Flag om te controleren of het Thumbs Up gebaar gedetecteerd is
-let isTimerRunning = false; // Flag om te controleren of de timer al loopt
-
-// ✅ Detectie van een "Thumbs Up" gebaar om het spel te starten
-async function detectThumbsUp(): Promise<boolean> {
-  if (!gestureRecognizer) return false;
-
-  const detections = await gestureRecognizer.recognizeForVideo(
-    videoElement,
-    performance.now()
-  );
-
-  if (!detections || !detections.gestures || detections.gestures.length === 0) {
-    isThumbsUpDetected = false; // Reset als er geen detectie is
-    return false;
-  }
-
-  // Controleer of een van de herkende gebaren "Thumbs Up" is
-  const thumbsUpGesture = detections.gestures.some((gestureSet) =>
-    gestureSet.some(
-      (gesture) => gesture.categoryName === "Thumb_Up" && gesture.score > 0.6
-    )
-  );
-
-  if (thumbsUpGesture) {
-    if (!isThumbsUpDetected) {
-      isThumbsUpDetected = true;
-      thumbsUpTimer = 2; // Reset de timer
-      if (!isTimerRunning) {
-        // Controleer of de timer al loopt
-        isTimerRunning = true;
-        startTimer(); // Start de timer bij de eerste detectie van de "Thumbs Up"
-      }
-    }
-  } else {
-    // ❗ Stop de timer als de speler de duim naar beneden doet
-    isThumbsUpDetected = false;
-    thumbsUpTimer = 2; // Reset de timer als de duim naar beneden is
-    isTimerRunning = false; // Stop de timer status
-  }
-
-  return thumbsUpGesture;
-}
-
-// ✅ Timer functie om af te tellen
-function startTimer(): void {
-  if (thumbsUpTimer > 0) {
-    thumbsUpTimer -= 0.1; // Verlaag de timer elke 100ms
-    updateTimerDisplay(); // Werk de timer bij in het p element
-    setTimeout(startTimer, 100); // Herhaal elke 100ms
-  } else if (thumbsUpTimer <= 0) {
-    if (!gameStarted) {
-      gameStarted = true;
-      startBallSpawner(); // Start ballen spawnen
-    }
-
-    // Verberg de timer als het spel is gestart
-    const timerElement = document.getElementById(
-      "timer"
-    ) as HTMLParagraphElement;
-    if (timerElement) {
-      timerElement.style.display = "none"; // Verberg de timer
-    }
-
-    isTimerRunning = false; // Stop de timer nadat hij is afgelopen
-  }
-}
-
-// ✅ Timer updaten
-function updateTimerDisplay(): void {
-  const timerElement = document.getElementById("timer") as HTMLParagraphElement;
-  if (timerElement) {
-    timerElement.textContent = `Timer: ${Math.max(thumbsUpTimer, 0).toFixed(
-      1
-    )}s`;
-  }
-}
 
 hands.onResults(async (results: HandsResult) => {
   if (gameOver) return;
@@ -173,9 +76,6 @@ hands.onResults(async (results: HandsResult) => {
 
       // Voeg deze regel toe om de nabijheid te controleren
       checkPlayerProximity(landmarks);
-
-      // ✅ Wacht op detectie van een "Thumbs Up" voor het starten van het spel
-      await detectThumbsUp();
     }
   }
 
@@ -514,8 +414,13 @@ function updateScore(): void {
 
 function startBallSpawner(): void {
   if (gameOver) return;
+
   createBalls();
-  setTimeout(startBallSpawner, ballSpawnTime);
+
+  // Only schedule the next ball spawn if the game has started
+  if (gameStarted) {
+    setTimeout(startBallSpawner, ballSpawnTime);
+  }
 }
 
 // ==================================================
@@ -525,14 +430,17 @@ async function start(): Promise<void> {
   await setupCamera();
   detectHands();
 
-  // ✅ Preload geluiden voor beter performance
+  // Start the countdown instead of immediately spawning balls
+  startCountdown();
+
+  // Preload sounds for better performance
   popSounds.forEach((sound) => {
     sound.load();
   });
 }
 
 async function detectHands(): Promise<void> {
-  const model = await hands.initialize();
+  await hands.initialize();
   const detect = async () => {
     await hands.send({ image: videoElement });
     requestAnimationFrame(detect);
@@ -603,4 +511,40 @@ function showWarningMessage(show: boolean): void {
     warningElement.classList.remove("warning-visible");
     warningElement.classList.add("warning-hidden");
   }
+}
+
+// Add this countdown function
+function startCountdown(): void {
+  countdownElement.textContent = `${countdownTime}`;
+  countdownElement.style.display = "block";
+
+  // Add initial animation class
+  countdownElement.classList.add("countdown-pulse");
+
+  const countdownInterval = setInterval(() => {
+    // Reset animations
+    countdownElement.classList.remove("countdown-pulse");
+    void countdownElement.offsetWidth; // Trigger reflow to restart animations
+
+    countdownTime--;
+
+    if (countdownTime <= 0) {
+      // Countdown finished
+      clearInterval(countdownInterval);
+
+      // Add final animation
+      countdownElement.textContent = "GO!";
+      countdownElement.classList.add("countdown-zoom-out");
+
+      // Hide countdown after animation completes
+      setTimeout(() => {
+        countdownElement.style.display = "none";
+        gameStarted = true;
+        startBallSpawner(); // Start spawning balls now
+      }, 800);
+    } else {
+      countdownElement.textContent = `${countdownTime}`;
+      countdownElement.classList.add("countdown-pulse");
+    }
+  }, 1000);
 }

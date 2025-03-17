@@ -11,6 +11,8 @@ const ctx = canvasElement.getContext("2d")!;
 
 let timerStarted = false;
 let timer: ReturnType<typeof setTimeout>;
+let restartTimer: ReturnType<typeof setTimeout> | null = null;
+let homeTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function setupCamera(): Promise<void> {
   const videoStream = await navigator.mediaDevices.getUserMedia({
@@ -59,11 +61,21 @@ async function detectThumbsUp(): Promise<boolean> {
     performance.now()
   );
 
+  const progressBar = document.getElementById("progress-restart")!;
+
   if (!detections || !detections.gestures || detections.gestures.length === 0) {
+    if (restartTimer) {
+      clearTimeout(restartTimer);
+      restartTimer = null;
+    }
+    progressBar.style.transition = "none"; // Direct resetten
+    progressBar.style.width = "0%";
+    requestAnimationFrame(() => {
+      progressBar.style.transition = "width 2s linear"; // Herstel de animatie
+    });
     return false;
   }
 
-  // Controleer of een van de herkende gebaren "Thumbs Up" is
   const thumbsUpGesture = detections.gestures.some((gestureSet) =>
     gestureSet.some(
       (gesture) => gesture.categoryName === "Thumb_Up" && gesture.score > 0.6
@@ -71,8 +83,23 @@ async function detectThumbsUp(): Promise<boolean> {
   );
 
   if (thumbsUpGesture) {
-    window.location.href = "game.html"; // Verwijs naar game.html bij thumbs up
+    if (!restartTimer) {
+      restartTimer = setTimeout(() => {
+        window.location.href = "game.html";
+      }, 2000);
+    }
+    progressBar.style.width = "100%";
     return true;
+  } else {
+    if (restartTimer) {
+      clearTimeout(restartTimer);
+      restartTimer = null;
+    }
+    progressBar.style.transition = "none"; // Direct resetten
+    progressBar.style.width = "0%";
+    requestAnimationFrame(() => {
+      progressBar.style.transition = "width 2s linear"; // Herstel de animatie
+    });
   }
 
   return false;
@@ -86,11 +113,21 @@ async function detectThumbsDown(): Promise<boolean> {
     performance.now()
   );
 
+  const progressBar = document.getElementById("progress-home")!;
+
   if (!detections || !detections.gestures || detections.gestures.length === 0) {
+    if (homeTimer) {
+      clearTimeout(homeTimer);
+      homeTimer = null;
+    }
+    progressBar.style.transition = "none"; // Direct resetten
+    progressBar.style.width = "0%";
+    requestAnimationFrame(() => {
+      progressBar.style.transition = "width 2s linear"; // Herstel de animatie
+    });
     return false;
   }
 
-  // Controleer of een van de herkende gebaren "Thumbs Down" is
   const thumbsDownGesture = detections.gestures.some((gestureSet) =>
     gestureSet.some(
       (gesture) => gesture.categoryName === "Thumb_Down" && gesture.score > 0.6
@@ -98,8 +135,23 @@ async function detectThumbsDown(): Promise<boolean> {
   );
 
   if (thumbsDownGesture) {
-    window.location.href = "../../index.html"; // Verwijs naar index.html bij thumbs down
+    if (!homeTimer) {
+      homeTimer = setTimeout(() => {
+        window.location.href = "../../index.html";
+      }, 2000);
+    }
+    progressBar.style.width = "100%";
     return true;
+  } else {
+    if (homeTimer) {
+      clearTimeout(homeTimer);
+      homeTimer = null;
+    }
+    progressBar.style.transition = "none"; // Direct resetten
+    progressBar.style.width = "0%";
+    requestAnimationFrame(() => {
+      progressBar.style.transition = "width 2s linear"; // Herstel de animatie
+    });
   }
 
   return false;

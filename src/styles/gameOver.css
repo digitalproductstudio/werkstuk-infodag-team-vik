@@ -114,3 +114,11 @@ canvas {
   text-align: center; /* Centreer de tekst */
   display: inline-block; /* Zorgt ervoor dat de achtergrond niet de hele breedte inneemt */
 }
+
+.progress-bar {
+  width: 0;
+  height: 10px;
+  background-color: #4caf50;
+  transition: width 2s linear;
+  margin-top: 5px;
+}
