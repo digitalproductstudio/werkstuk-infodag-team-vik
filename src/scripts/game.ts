@@ -60,8 +60,8 @@ const hands = new Hands({
 hands.setOptions({
   maxNumHands: 4,
   modelComplexity: 1,
-  minDetectionConfidence: 0.5,
-  minTrackingConfidence: 0.5,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7,
 });
 
 hands.onResults(async (results: HandsResult) => {
@@ -223,7 +223,7 @@ function growBalls(): void {
       setTimeout(() => {
         // Verwijs naar de gameover pagina en geef de score mee als query parameter
         window.location.href = `gameOver.html?score=${score}`;
-      }, 0);
+      }, 1000);
     }
   });
 }

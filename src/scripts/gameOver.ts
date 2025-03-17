@@ -49,8 +49,8 @@ const gestureRecognizer = await GestureRecognizer.createFromOptions(vision, {
 hands.setOptions({
   maxNumHands: 4,
   modelComplexity: 1,
-  minDetectionConfidence: 0.5,
-  minTrackingConfidence: 0.5,
+  minDetectionConfidence: 0.7,
+  minTrackingConfidence: 0.7,
 });
 
 async function detectThumbsUp(): Promise<boolean> {
@@ -243,13 +243,13 @@ async function start(): Promise<void> {
   startInactivityTimer(); // Start de timer voor inactiviteit
 }
 
-// Timer om de gebruiker na 10 seconden inactiviteit naar de indexpagina te sturen
+// Timer om de gebruiker na 20 seconden inactiviteit naar de indexpagina te sturen
 function startInactivityTimer() {
   if (timerStarted) return; // Zorg ervoor dat de timer niet meerdere keren wordt gestart
   timerStarted = true;
 
   timer = setTimeout(() => {
-    window.location.href = "../../index.html"; // Verwijs naar index.html na 10 seconden zonder gebaren
+    window.location.href = "../../index.html"; // Verwijs naar index.html na 20 seconden zonder gebaren
   }, 20000);
 }
 
